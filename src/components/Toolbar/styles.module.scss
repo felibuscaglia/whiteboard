@@ -1,0 +1,6 @@
+@import '../../styles/mixins.scss';
+
+#toolbar {
+  @include display-flex;
+  gap: 4px;
+}
