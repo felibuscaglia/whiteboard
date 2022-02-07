@@ -1,0 +1,22 @@
+@import '../../styles/mixins.scss';
+
+#tooltip {
+  position: absolute;
+  margin-top: 0.625rem;
+  @include display-flex(column);
+  div {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid #222222;
+  }
+  span {
+    display: inline-block;
+    padding: 6px 7px;
+    background: #222222;
+    color: white;
+    text-transform: capitalize;
+    font-size: 0.75rem;
+  }
+}

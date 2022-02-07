@@ -1,4 +1,4 @@
-import {  useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { transformNumberToPx } from "../../shared/helpers";
 
 const DrawingBoard = () => {
@@ -25,7 +25,8 @@ const DrawingBoard = () => {
     }
   }, []);
 
-  const startDrawing = ({ nativeEvent }: any) => { // TODO: Change the prop type
+  const startDrawing = ({ nativeEvent }: any) => {
+    // TODO: Change the prop type
     const { offsetX, offsetY } = nativeEvent;
     contextRef.current?.beginPath();
     contextRef.current?.moveTo(offsetX, offsetY);
@@ -51,6 +52,8 @@ const DrawingBoard = () => {
       onMouseUp={finishDrawing}
       onMouseMove={draw}
       ref={canvasRef}
+      height={"100%"}
+      width={"100%"}
     />
   );
 };

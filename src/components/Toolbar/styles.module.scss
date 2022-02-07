@@ -3,4 +3,7 @@
 #toolbar {
   @include display-flex;
   gap: 4px;
+  position: absolute;
+  top: 16px;
+  right: calc(16px + env(safe-area-inset-right));
 }
