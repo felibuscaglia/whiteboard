@@ -2,8 +2,9 @@
 
 #tooltip {
   position: absolute;
-  margin-top: 0.625rem;
   @include display-flex(column);
+  margin-top: 85px;
+  width: 100%;
   div {
     width: 0;
     height: 0;

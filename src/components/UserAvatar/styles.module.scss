@@ -1,0 +1,9 @@
+@import "../../styles/mixins.scss";
+
+#userAvatar {
+  @include display-flex(column);
+}
+
+#avatar {
+  cursor: pointer;
+}
