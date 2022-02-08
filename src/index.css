@@ -2,6 +2,7 @@ body {
   margin: 0;
   font-family: "Rubik", sans-serif;
   overflow: hidden;
+  cursor: url(./assets/12116c9270d6a33411ec8fd07b2ce4ec.png) 64 64, auto;
 }
 
 button {

@@ -3,7 +3,7 @@ import Button from "../Button";
 import UserAvatar from "../UserAvatar";
 import styles from './styles.module.scss';
 
-const Toolbar = () => {
+const ButtonBar = () => {
   return (
     <div id={styles.toolbar}>
       <UserAvatar />
@@ -23,4 +23,4 @@ const Toolbar = () => {
   );
 };
 
-export default Toolbar;
+export default ButtonBar;

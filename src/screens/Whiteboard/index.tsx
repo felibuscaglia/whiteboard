@@ -1,5 +1,5 @@
 import DrawingBoard from "../../components/DrawingBoard"
-import Toolbar from "../../components/Toolbar";
+import Toolbar from "../../components/ButtonBar";
 
 const WhiteboardScreen = () => {
   return (
