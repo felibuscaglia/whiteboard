@@ -1,0 +1,33 @@
+@import "../../styles/import.scss";
+
+#toolbar {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  border-top: 1px solid $light-gray;
+  padding: 10px;
+  @include display-flex(row, center, space-between);
+  box-sizing: border-box;
+
+  input {
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 2rem;
+    color: $black;
+    width: 18.75rem;
+    border: none;
+    margin-left: 10px;
+  }
+
+  input::placeholder {
+    color: #d2d2d2;
+  }
+
+  div {
+    @include display-flex();
+  }
+
+  #buttonsWrapper {
+    gap: 0.25rem;
+  }
+}

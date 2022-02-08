@@ -8,3 +8,8 @@ body {
 button {
   font-family: "Rubik", sans-serif;
 }
+
+input {
+  font-family: "Rubik", sans-serif;
+  outline: none;
+}

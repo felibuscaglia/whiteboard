@@ -1,13 +1,15 @@
-import DrawingBoard from "../../components/DrawingBoard"
-import Toolbar from "../../components/ButtonBar";
+import DrawingBoard from "../../components/DrawingBoard";
+import Toolbar from "../../components/Toolbar";
+import ButtonBar from "../../components/ButtonBar";
 
 const WhiteboardScreen = () => {
   return (
     <div>
-      <Toolbar />
+      <ButtonBar />
       <DrawingBoard />
+      <Toolbar />
     </div>
-  )
-}
+  );
+};
 
 export default WhiteboardScreen;
