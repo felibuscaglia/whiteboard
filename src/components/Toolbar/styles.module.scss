@@ -30,4 +30,11 @@
   #buttonsWrapper {
     gap: 0.25rem;
   }
+
+  #actionButtons {
+    gap: 1.5rem;
+    svg {
+      transition: .4s;
+    }
+  }
 }
