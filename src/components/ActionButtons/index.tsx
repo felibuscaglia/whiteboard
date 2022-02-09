@@ -4,6 +4,7 @@ import { BiUndo } from "react-icons/bi";
 import style from "./styles.module.scss";
 import { buttonBlackColor } from "../../shared/constants";
 import { useState } from "react";
+import ColorChangerButton from "../ColorChangerButton";
 
 const icons = [
   { icon: HiOutlinePencil },
@@ -11,6 +12,7 @@ const icons = [
   { icon: RiText },
   { icon: RiEraserFill },
   { icon: BiUndo },
+  { icon: ColorChangerButton }
 ];
 
 const DEFAULT_SELECTED_OPTION = 0;

@@ -1,6 +1,6 @@
 @import '../../styles/mixins.scss';
 
-#toolbar {
+#buttonBar {
   @include display-flex;
   gap: 4px;
   position: absolute;

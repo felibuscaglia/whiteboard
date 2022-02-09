@@ -1,13 +1,13 @@
 import styles from "./styles.module.scss";
 import { HiMenuAlt4 } from "react-icons/hi";
 import { buttonBlackColor } from "../../shared/constants";
-import ActionButtons from "./ActionButtons";
+import ActionButtons from "../ActionButtons";
 import Button from "../Button";
 
 const Toolbar = () => {
   return (
     <div id={styles.toolbar}>
-      <div>
+      <div id={styles.menuAndTitle}>
         <HiMenuAlt4 size={"1.875rem"} color={buttonBlackColor} />
         <input placeholder="Enter a title" />
       </div>

@@ -5,7 +5,7 @@ import styles from './styles.module.scss';
 
 const ButtonBar = () => {
   return (
-    <div id={styles.toolbar}>
+    <div id={styles.buttonBar}>
       <UserAvatar />
       <Button
         text="Share"

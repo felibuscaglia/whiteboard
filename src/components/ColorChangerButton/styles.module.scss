@@ -1,0 +1,12 @@
+#colorPlaceholder {
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 50%;
+  border: 1px solid rgba(34, 34, 34, 0.1);
+  cursor: pointer;
+  padding: 2px;
+}
+
+#colorPlaceholder:hover {
+  border-color: rgba(34, 34, 34, 0.25);
+}

@@ -1,0 +1,13 @@
+@import '../../styles/variables.scss';
+
+#colorTooltip {
+  position: absolute;
+  bottom: 3.3rem;
+  background-color: white;
+  right: 34.1rem;
+  height: 1.125rem;
+  border: 1px solid $light-gray;
+  padding: 10px;
+  border-radius: 1.438rem;
+  gap: 0.469rem;
+}
