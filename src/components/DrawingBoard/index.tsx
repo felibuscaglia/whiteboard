@@ -1,10 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
+import { WhiteboardContext } from "../../contexts/WhiteboardContext";
+import { buttonBlackColor } from "../../shared/constants";
 import { transformNumberToPx } from "../../shared/helpers";
 
 const DrawingBoard = () => {
   const [isDrawing, setIsDrawing] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
+  const { selectedColor } = useContext(WhiteboardContext);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -18,12 +21,18 @@ const DrawingBoard = () => {
       if (context) {
         context.scale(2, 2);
         context.lineCap = "round";
-        context.strokeStyle = "black";
+        context.strokeStyle = buttonBlackColor;
         context.lineWidth = 5;
         contextRef.current = context;
       }
     }
   }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext("2d");
+    if (context) context.strokeStyle = selectedColor;
+  }, [selectedColor]);
 
   const startDrawing = ({ nativeEvent }: any) => {
     // TODO: Change the prop type

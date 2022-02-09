@@ -17,7 +17,7 @@ const colors = [
 ];
 
 const WhiteboardScreen = () => {
-  const [selectedColor, setSelectedColor] = useState(colors[0]);
+  const [selectedColor, setSelectedColor] = useState(colors[colors.length - 1]);
   return (
     <WhiteboardContext.Provider
       value={{ colors, selectedColor, setSelectedColor }}
