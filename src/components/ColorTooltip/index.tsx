@@ -1,19 +1,11 @@
-import { buttonBlackColor } from "../../shared/constants";
 import ColorCircle from "../ColorCircle";
 import style from "./styles.module.scss";
 
-const colors = [
-  "#F35352",
-  "#FF9B3C",
-  "#FFD335",
-  "#26C281",
-  "#2B90EF",
-  "#6A46FA",
-  "#B05DD9",
-  buttonBlackColor,
-];
+interface IColorTooltip {
+  colors: string[];
+}
 
-const ColorTooltip = () => {
+const ColorTooltip = ({ colors }: IColorTooltip) => {
   return (
     <div id={style.colorTooltip}>
       {colors.map((color) => (

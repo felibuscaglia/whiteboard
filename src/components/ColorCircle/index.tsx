@@ -1,3 +1,6 @@
+import { useContext } from "react";
+import { WhiteboardContext } from "../../contexts/WhiteboardContext";
+
 interface IColorCircleProps {
   color: string;
   height: string;
@@ -5,6 +8,7 @@ interface IColorCircleProps {
 }
 
 const ColorCircle = ({ color, height, width }: IColorCircleProps) => {
+  const { setSelectedColor } = useContext(WhiteboardContext);
   return (
     <div
       style={{
@@ -13,6 +17,7 @@ const ColorCircle = ({ color, height, width }: IColorCircleProps) => {
         height,
         width,
       }}
+      onClick={() => setSelectedColor(color)}
     />
   );
 };

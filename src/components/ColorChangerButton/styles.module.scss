@@ -1,3 +1,7 @@
+#colorChangerBtn {
+  cursor: pointer;
+}
+
 #colorPlaceholder {
   height: 1.5rem;
   width: 1.5rem;
@@ -5,6 +9,7 @@
   border: 1px solid rgba(34, 34, 34, 0.1);
   cursor: pointer;
   padding: 2px;
+  transition: .2s;
 }
 
 #colorPlaceholder:hover {
