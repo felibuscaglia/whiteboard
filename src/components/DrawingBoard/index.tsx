@@ -2,6 +2,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { WhiteboardContext } from "../../contexts/WhiteboardContext";
 import { buttonBlackColor } from "../../shared/constants";
 import { transformNumberToPx } from "../../shared/helpers";
+import style from './styles.module.scss';
 
 const DrawingBoard = () => {
   const [isDrawing, setIsDrawing] = useState(false);
@@ -61,8 +62,7 @@ const DrawingBoard = () => {
       onMouseUp={finishDrawing}
       onMouseMove={draw}
       ref={canvasRef}
-      height={"100%"}
-      width={"100%"}
+      id={style.drawingBoard}
     />
   );
 };
