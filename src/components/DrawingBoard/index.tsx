@@ -1,10 +1,15 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { WhiteboardContext } from "../../contexts/WhiteboardContext";
 import { buttonBlackColor } from "../../shared/constants";
+import { Actions } from "../../shared/enums";
 import { transformNumberToPx } from "../../shared/helpers";
-import style from './styles.module.scss';
+import style from "./styles.module.scss";
 
-const DrawingBoard = () => {
+interface IDrawingBoardProps {
+  activeAction: Actions;
+}
+
+const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -43,13 +48,18 @@ const DrawingBoard = () => {
     setIsDrawing(true);
   };
 
-  const finishDrawing = () => {
+  const finishDrawing = ({ nativeEvent }: any) => {
+    if (activeAction === Actions.LINE_DRAWING) {
+      const { offsetX, offsetY } = nativeEvent;
+      contextRef.current?.lineTo(offsetX, offsetY);
+      contextRef.current?.stroke();
+    }
     contextRef.current?.closePath();
     setIsDrawing(false);
   };
 
   const draw = ({ nativeEvent }: any) => {
-    if (!isDrawing) return;
+    if (!isDrawing || activeAction !== Actions.DRAWING) return;
 
     const { offsetX, offsetY } = nativeEvent;
     contextRef.current?.lineTo(offsetX, offsetY);
