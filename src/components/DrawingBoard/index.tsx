@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { MouseEvent, useContext, useEffect, useRef, useState } from "react";
 import { WhiteboardContext } from "../../contexts/WhiteboardContext";
 import { buttonBlackColor } from "../../shared/constants";
 import { Actions } from "../../shared/enums";
@@ -9,8 +9,15 @@ interface IDrawingBoardProps {
   activeAction: Actions;
 }
 
+interface ILineStartingPoints {
+  offsetX: number;
+  offsetY: number;
+}
+
 const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
   const [isDrawing, setIsDrawing] = useState(false);
+  const [lineStartingPoints, setLineStartingPoints] =
+    useState<ILineStartingPoints | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
   const { selectedColor } = useContext(WhiteboardContext);
@@ -40,37 +47,88 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
     if (context) context.strokeStyle = selectedColor;
   }, [selectedColor]);
 
-  const startDrawing = ({ nativeEvent }: any) => {
-    // TODO: Change the prop type
+  const handleMouseDown = (e: MouseEvent) => {
+    switch (activeAction) {
+      case Actions.DRAWING:
+        startFreeDrawing(e);
+        break;
+      case Actions.LINE_DRAWING:
+        startLineDrawing(e);
+        break;
+    }
+  };
+
+  const handleMouseUp = (e: MouseEvent) => {
+    switch (activeAction) {
+      case Actions.DRAWING:
+        finishFreeDrawing(e);
+        break;
+      case Actions.LINE_DRAWING:
+        setLineStartingPoints(null);
+        break;
+    }
+  };
+  const handleMouseMove = (e: MouseEvent) => {
+    switch (activeAction) {
+      case Actions.DRAWING:
+        freeDraw(e);
+        break;
+      case Actions.LINE_DRAWING:
+        lineDraw(e);
+        break;
+    }
+  };
+
+  // Mouse down functions
+
+  const startLineDrawing = ({ nativeEvent }: MouseEvent) => {
+    const { offsetX, offsetY } = nativeEvent;
+    setLineStartingPoints({ offsetX, offsetY });
+  };
+
+  const startFreeDrawing = ({ nativeEvent }: MouseEvent) => {
     const { offsetX, offsetY } = nativeEvent;
     contextRef.current?.beginPath();
     contextRef.current?.moveTo(offsetX, offsetY);
     setIsDrawing(true);
   };
 
-  const finishDrawing = ({ nativeEvent }: any) => {
-    if (activeAction === Actions.LINE_DRAWING) {
-      const { offsetX, offsetY } = nativeEvent;
-      contextRef.current?.lineTo(offsetX, offsetY);
-      contextRef.current?.stroke();
-    }
+  // Mouse up functions
+
+  const finishFreeDrawing = ({ nativeEvent }: MouseEvent) => {
     contextRef.current?.closePath();
     setIsDrawing(false);
   };
 
-  const draw = ({ nativeEvent }: any) => {
-    if (!isDrawing || activeAction !== Actions.DRAWING) return;
+  // Mouse move functions
 
+  const freeDraw = ({ nativeEvent }: MouseEvent) => {
+    if (!isDrawing) return;
     const { offsetX, offsetY } = nativeEvent;
     contextRef.current?.lineTo(offsetX, offsetY);
     contextRef.current?.stroke();
   };
 
+  const lineDraw = ({ nativeEvent }: MouseEvent) => {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext("2d");
+    if (lineStartingPoints && canvas) {
+      context?.clearRect(0, 0, canvas.width, canvas.height);
+      context?.beginPath();
+      context?.moveTo(lineStartingPoints.offsetX, lineStartingPoints.offsetY);
+      context?.lineTo(
+        nativeEvent.pageX - lineStartingPoints.offsetX,
+        nativeEvent.pageY - lineStartingPoints.offsetY
+      );
+      context?.stroke();
+    }
+  };
+
   return (
     <canvas
-      onMouseDown={startDrawing}
-      onMouseUp={finishDrawing}
-      onMouseMove={draw}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      onMouseMove={handleMouseMove}
       ref={canvasRef}
       id={style.drawingBoard}
     />
