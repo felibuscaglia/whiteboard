@@ -47,13 +47,20 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
     if (context) context.strokeStyle = selectedColor;
   }, [selectedColor]);
 
-  const handleMouseDown = (e: MouseEvent) => {
+  const handleMouseDown = ({ nativeEvent, pageX, pageY }: MouseEvent) => {
+    const { offsetX, offsetY } = nativeEvent;
+    const canvas = canvasRef.current;
+    const offsetLeft = canvas?.offsetLeft || 0;
+    const offsetTop = canvas?.offsetTop || 0;
     switch (activeAction) {
       case Actions.DRAWING:
-        startFreeDrawing(e);
+        startFreeDrawing(offsetX, offsetY);
         break;
       case Actions.LINE_DRAWING:
-        startLineDrawing(e);
+        setLineStartingPoints({
+          offsetX: pageX - offsetLeft,
+          offsetY: pageY - offsetTop,
+        });
         break;
     }
   };
@@ -61,7 +68,7 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
   const handleMouseUp = (e: MouseEvent) => {
     switch (activeAction) {
       case Actions.DRAWING:
-        finishFreeDrawing(e);
+        finishFreeDrawing();
         break;
       case Actions.LINE_DRAWING:
         setLineStartingPoints(null);
@@ -69,25 +76,23 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
     }
   };
   const handleMouseMove = (e: MouseEvent) => {
+    const canvas = canvasRef.current;
+    const offsetLeft = canvas?.offsetLeft || 0;
+    const offsetTop = canvas?.offsetTop || 0;
+
     switch (activeAction) {
       case Actions.DRAWING:
         freeDraw(e);
         break;
       case Actions.LINE_DRAWING:
-        lineDraw(e);
+        lineDraw(e, offsetLeft, offsetTop);
         break;
     }
   };
 
   // Mouse down functions
 
-  const startLineDrawing = ({ nativeEvent }: MouseEvent) => {
-    const { offsetX, offsetY } = nativeEvent;
-    setLineStartingPoints({ offsetX, offsetY });
-  };
-
-  const startFreeDrawing = ({ nativeEvent }: MouseEvent) => {
-    const { offsetX, offsetY } = nativeEvent;
+  const startFreeDrawing = (offsetX: number, offsetY: number) => {
     contextRef.current?.beginPath();
     contextRef.current?.moveTo(offsetX, offsetY);
     setIsDrawing(true);
@@ -95,7 +100,7 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
 
   // Mouse up functions
 
-  const finishFreeDrawing = ({ nativeEvent }: MouseEvent) => {
+  const finishFreeDrawing = () => {
     contextRef.current?.closePath();
     setIsDrawing(false);
   };
@@ -109,17 +114,18 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
     contextRef.current?.stroke();
   };
 
-  const lineDraw = ({ nativeEvent }: MouseEvent) => {
+  const lineDraw = (
+    { pageX, pageY }: MouseEvent,
+    offsetLeft: number,
+    offsetTop: number
+  ) => {
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d");
     if (lineStartingPoints && canvas) {
       context?.clearRect(0, 0, canvas.width, canvas.height);
       context?.beginPath();
       context?.moveTo(lineStartingPoints.offsetX, lineStartingPoints.offsetY);
-      context?.lineTo(
-        nativeEvent.pageX - lineStartingPoints.offsetX,
-        nativeEvent.pageY - lineStartingPoints.offsetY
-      );
+      context?.lineTo(pageX - offsetLeft, pageY - offsetTop);
       context?.stroke();
     }
   };
