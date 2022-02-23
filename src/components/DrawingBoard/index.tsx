@@ -76,7 +76,7 @@ const lineDraw = (
   const lineCanvas = lineDrawingCanvasRef.current;
   const lineCanvasContext = lineCanvas?.getContext("2d");
   if (lineStartingPoints && lineCanvas && lineCanvasContext) {
-    setCanvasProperties(lineCanvas, lineCanvasContext); // Only do it one time. Here's repeated.
+    lineCanvasContext.clearRect(0, 0, lineCanvas.width, lineCanvas.height);
     const lineTo: Coordinates = {
       x: pageX - offsetLeft,
       y: pageY - offsetTop,
@@ -113,9 +113,12 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (canvas) {
+    const lineCanvas = lineDrawingCanvasRef.current;
+    if (canvas && lineCanvas) {
+      const lineCanvasContext = lineCanvas?.getContext("2d");
       const context = canvas.getContext("2d");
       setCanvasProperties(canvas, context);
+      setCanvasProperties(lineCanvas, lineCanvasContext);
       contextRef.current = context;
     }
   }, []);
@@ -214,6 +217,3 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
 };
 
 export default DrawingBoard;
-
-// TODO Before merging:
-// - Only set the second canvas properties once.
