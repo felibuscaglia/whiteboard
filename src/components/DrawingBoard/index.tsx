@@ -14,30 +14,38 @@ interface ILineStartingPoints {
   offsetY: number;
 }
 
+const setCanvasProperties = (
+  canvas: HTMLCanvasElement,
+  context: CanvasRenderingContext2D | null
+) => {
+  canvas.width = window.innerWidth * 2;
+  canvas.height = window.innerHeight * 2;
+  canvas.style.height = transformNumberToPx(window.innerHeight);
+  canvas.style.width = transformNumberToPx(window.innerWidth);
+
+  if (context) {
+    context.scale(2, 2);
+    context.lineCap = "round";
+    context.strokeStyle = buttonBlackColor;
+    context.lineWidth = 5;
+  }
+};
+
 const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [lineStartingPoints, setLineStartingPoints] =
     useState<ILineStartingPoints | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const lineDrawingCanvasRef = useRef<HTMLCanvasElement>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
   const { selectedColor } = useContext(WhiteboardContext);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
-      canvas.width = window.innerWidth * 2;
-      canvas.height = window.innerHeight * 2;
-      canvas.style.height = transformNumberToPx(window.innerHeight);
-      canvas.style.width = transformNumberToPx(window.innerWidth);
-
       const context = canvas.getContext("2d");
-      if (context) {
-        context.scale(2, 2);
-        context.lineCap = "round";
-        context.strokeStyle = buttonBlackColor;
-        context.lineWidth = 5;
-        contextRef.current = context;
-      }
+      setCanvasProperties(canvas, context);
+      contextRef.current = context;
     }
   }, []);
 
@@ -65,7 +73,7 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
     }
   };
 
-  const handleMouseUp = (e: MouseEvent) => {
+  const handleMouseUp = () => {
     switch (activeAction) {
       case Actions.DRAWING:
         finishFreeDrawing();
@@ -119,9 +127,10 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
     offsetLeft: number,
     offsetTop: number
   ) => {
-    const canvas = canvasRef.current;
+    const canvas = lineDrawingCanvasRef.current;
     const context = canvas?.getContext("2d");
-    if (lineStartingPoints && canvas) {
+    if (lineStartingPoints && canvas && context) {
+      setCanvasProperties(canvas, context);
       context?.clearRect(0, 0, canvas.width, canvas.height);
       context?.beginPath();
       context?.moveTo(lineStartingPoints.offsetX, lineStartingPoints.offsetY);
@@ -131,13 +140,24 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
   };
 
   return (
-    <canvas
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseMove={handleMouseMove}
-      ref={canvasRef}
-      id={style.drawingBoard}
-    />
+    <>
+      <canvas
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        ref={canvasRef}
+        id={style.drawingBoard}
+      />
+      {activeAction === Actions.LINE_DRAWING && (
+        <canvas
+          id={style.lineDrawingBoard}
+          ref={lineDrawingCanvasRef}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+        />
+      )}
+    </>
   );
 };
 
