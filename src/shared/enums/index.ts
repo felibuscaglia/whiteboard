@@ -1,6 +1,6 @@
 export enum Actions {
-  DRAWING,
-  LINE_DRAWING,
-  TEXT,
-  ERASE
+  DRAWING = 'Drawing',
+  LINE_DRAWING = 'Line Drawing',
+  TEXT = 'Text',
+  ERASE = 'Erase'
 }

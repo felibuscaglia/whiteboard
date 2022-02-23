@@ -44,6 +44,7 @@ const ActionButtons = () => {
           onClick={() => handleOnClick(i, action)}
           onMouseEnter={() => setHoveredBtn(i)}
           onMouseLeave={() => setHoveredBtn(null)}
+          key={i}
         />
       ))}
     </div>

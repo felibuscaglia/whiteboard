@@ -1,6 +1,8 @@
 import {
   Dispatch,
   MouseEvent,
+  MutableRefObject,
+  RefObject,
   SetStateAction,
   useContext,
   useEffect,
@@ -26,6 +28,61 @@ const finishLineDrawing = (
 ) => {
   setLineStartingPoints(null);
   canvasContext && moveTo && drawInCanvas(canvasContext, moveTo, lineTo);
+};
+
+// Mouse down functions
+
+const startFreeDrawing = (
+  contextRef: MutableRefObject<CanvasRenderingContext2D | null>,
+  offsetX: number,
+  offsetY: number,
+  setIsDrawing: Dispatch<SetStateAction<boolean>>
+) => {
+  contextRef.current?.beginPath();
+  contextRef.current?.moveTo(offsetX, offsetY);
+  setIsDrawing(true);
+};
+
+// Mouse up functions
+
+const finishFreeDrawing = (
+  contextRef: MutableRefObject<CanvasRenderingContext2D | null>,
+  setIsDrawing: Dispatch<SetStateAction<boolean>>
+) => {
+  contextRef.current?.closePath();
+  setIsDrawing(false);
+};
+
+// Mouse move functions
+
+const freeDraw = (
+  { nativeEvent }: MouseEvent,
+  isDrawing: boolean,
+  contextRef: MutableRefObject<CanvasRenderingContext2D | null>
+) => {
+  if (!isDrawing) return;
+  const { offsetX, offsetY } = nativeEvent;
+  contextRef.current?.lineTo(offsetX, offsetY);
+  contextRef.current?.stroke();
+};
+
+const lineDraw = (
+  { pageX, pageY }: MouseEvent,
+  offsetLeft: number,
+  offsetTop: number,
+  lineDrawingCanvasRef: RefObject<HTMLCanvasElement>,
+  lineStartingPoints: Coordinates | null
+) => {
+  const lineCanvas = lineDrawingCanvasRef.current;
+  const lineCanvasContext = lineCanvas?.getContext("2d");
+  if (lineStartingPoints && lineCanvas && lineCanvasContext) {
+    setCanvasProperties(lineCanvas, lineCanvasContext); // Only do it one time. Here's repeated.
+    const lineTo: Coordinates = {
+      x: pageX - offsetLeft,
+      y: pageY - offsetTop,
+    };
+    drawInCanvas(lineCanvasContext, lineStartingPoints, lineTo);
+  }
 };
 
 const setCanvasProperties = (
@@ -76,7 +133,7 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
     const offsetTop = canvas?.offsetTop || 0;
     switch (activeAction) {
       case Actions.DRAWING:
-        startFreeDrawing(offsetX, offsetY);
+        startFreeDrawing(contextRef, offsetX, offsetY, setIsDrawing);
         break;
       case Actions.LINE_DRAWING:
         setLineStartingPoints({
@@ -90,7 +147,7 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
   const handleMouseUp = ({ pageX, pageY }: MouseEvent) => {
     switch (activeAction) {
       case Actions.DRAWING:
-        finishFreeDrawing();
+        finishFreeDrawing(contextRef, setIsDrawing);
         break;
       case Actions.LINE_DRAWING:
         const canvas = canvasRef.current;
@@ -118,52 +175,17 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
 
     switch (activeAction) {
       case Actions.DRAWING:
-        freeDraw(e);
+        freeDraw(e, isDrawing, contextRef);
         break;
       case Actions.LINE_DRAWING:
-        lineDraw(e, offsetLeft, offsetTop);
+        lineDraw(
+          e,
+          offsetLeft,
+          offsetTop,
+          lineDrawingCanvasRef,
+          lineStartingPoints
+        );
         break;
-    }
-  };
-
-  // Mouse down functions
-
-  const startFreeDrawing = (offsetX: number, offsetY: number) => {
-    contextRef.current?.beginPath();
-    contextRef.current?.moveTo(offsetX, offsetY);
-    setIsDrawing(true);
-  };
-
-  // Mouse up functions
-
-  const finishFreeDrawing = () => {
-    contextRef.current?.closePath();
-    setIsDrawing(false);
-  };
-
-  // Mouse move functions
-
-  const freeDraw = ({ nativeEvent }: MouseEvent) => {
-    if (!isDrawing) return;
-    const { offsetX, offsetY } = nativeEvent;
-    contextRef.current?.lineTo(offsetX, offsetY);
-    contextRef.current?.stroke();
-  };
-
-  const lineDraw = (
-    { pageX, pageY }: MouseEvent,
-    offsetLeft: number,
-    offsetTop: number
-  ) => {
-    const lineCanvas = lineDrawingCanvasRef.current;
-    const lineCanvasContext = lineCanvas?.getContext("2d");
-    if (lineStartingPoints && lineCanvas && lineCanvasContext) {
-      setCanvasProperties(lineCanvas, lineCanvasContext); // Only do it one time. Here's repeated.
-      const lineTo: Coordinates = {
-        x: pageX - offsetLeft,
-        y: pageY - offsetTop,
-      };
-      drawInCanvas(lineCanvasContext, lineStartingPoints, lineTo);
     }
   };
 
@@ -176,15 +198,17 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
         ref={canvasRef}
         id={style.drawingBoard}
       />
-      {activeAction === Actions.LINE_DRAWING && (
-        <canvas
-          id={style.lineDrawingBoard}
-          ref={lineDrawingCanvasRef}
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
-          onMouseMove={handleMouseMove}
-        />
-      )}
+      <canvas
+        id={style.lineDrawingBoard}
+        ref={lineDrawingCanvasRef}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        style={{
+          visibility:
+            activeAction === Actions.LINE_DRAWING ? "visible" : "hidden",
+        }}
+      />
     </>
   );
 };
@@ -192,6 +216,4 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
 export default DrawingBoard;
 
 // TODO Before merging:
-// - Display the second canvas all the time, change the visibility with CSS
-// - Extract all those functions to outside the component
 // - Only set the second canvas properties once.
