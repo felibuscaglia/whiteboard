@@ -114,19 +114,28 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
   useEffect(() => {
     const canvas = canvasRef.current;
     const lineCanvas = lineDrawingCanvasRef.current;
-    if (canvas && lineCanvas) {
-      const lineCanvasContext = lineCanvas?.getContext("2d");
+    if (canvas) {
       const context = canvas.getContext("2d");
       setCanvasProperties(canvas, context);
-      setCanvasProperties(lineCanvas, lineCanvasContext);
       contextRef.current = context;
+    }
+
+    if (lineCanvas) {
+      const lineCanvasContext = lineCanvas?.getContext("2d");
+      setCanvasProperties(lineCanvas, lineCanvasContext);
     }
   }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    const lineDrawingCanvas = lineDrawingCanvasRef.current;
     const context = canvas?.getContext("2d");
+    const lineDrawingCanvasContext = lineDrawingCanvas?.getContext("2d");
+
     if (context) context.strokeStyle = selectedColor;
+    if (lineDrawingCanvasContext) {
+      lineDrawingCanvasContext.strokeStyle = selectedColor;
+    }
   }, [selectedColor]);
 
   const handleMouseDown = ({ nativeEvent, pageX, pageY }: MouseEvent) => {
