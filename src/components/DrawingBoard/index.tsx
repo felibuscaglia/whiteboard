@@ -1,18 +1,32 @@
-import { MouseEvent, useContext, useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  MouseEvent,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { WhiteboardContext } from "../../contexts/WhiteboardContext";
 import { buttonBlackColor } from "../../shared/constants";
 import { Actions } from "../../shared/enums";
-import { transformNumberToPx } from "../../shared/helpers";
+import { drawInCanvas, transformNumberToPx } from "../../shared/helpers";
+import { Coordinates } from "../../shared/interfaces";
 import style from "./styles.module.scss";
 
 interface IDrawingBoardProps {
   activeAction: Actions;
 }
 
-interface ILineStartingPoints {
-  offsetX: number;
-  offsetY: number;
-}
+const finishLineDrawing = (
+  setLineStartingPoints: Dispatch<SetStateAction<Coordinates | null>>,
+  moveTo: Coordinates | null,
+  lineTo: Coordinates,
+  canvasContext?: CanvasRenderingContext2D | null
+) => {
+  setLineStartingPoints(null);
+  canvasContext && moveTo && drawInCanvas(canvasContext, moveTo, lineTo);
+};
 
 const setCanvasProperties = (
   canvas: HTMLCanvasElement,
@@ -34,7 +48,7 @@ const setCanvasProperties = (
 const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [lineStartingPoints, setLineStartingPoints] =
-    useState<ILineStartingPoints | null>(null);
+    useState<Coordinates | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lineDrawingCanvasRef = useRef<HTMLCanvasElement>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -66,23 +80,37 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
         break;
       case Actions.LINE_DRAWING:
         setLineStartingPoints({
-          offsetX: pageX - offsetLeft,
-          offsetY: pageY - offsetTop,
+          x: pageX - offsetLeft,
+          y: pageY - offsetTop,
         });
         break;
     }
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = ({ pageX, pageY }: MouseEvent) => {
     switch (activeAction) {
       case Actions.DRAWING:
         finishFreeDrawing();
         break;
       case Actions.LINE_DRAWING:
-        setLineStartingPoints(null);
+        const canvas = canvasRef.current;
+        const offsetLeft = canvas?.offsetLeft || 0;
+        const offsetTop = canvas?.offsetTop || 0;
+        const lineTo = {
+          x: pageX - offsetLeft,
+          y: pageY - offsetTop,
+        };
+        const canvasContext = canvas?.getContext("2d");
+        finishLineDrawing(
+          setLineStartingPoints,
+          lineStartingPoints,
+          lineTo,
+          canvasContext
+        );
         break;
     }
   };
+
   const handleMouseMove = (e: MouseEvent) => {
     const canvas = canvasRef.current;
     const offsetLeft = canvas?.offsetLeft || 0;
@@ -127,15 +155,15 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
     offsetLeft: number,
     offsetTop: number
   ) => {
-    const canvas = lineDrawingCanvasRef.current;
-    const context = canvas?.getContext("2d");
-    if (lineStartingPoints && canvas && context) {
-      setCanvasProperties(canvas, context);
-      context?.clearRect(0, 0, canvas.width, canvas.height);
-      context?.beginPath();
-      context?.moveTo(lineStartingPoints.offsetX, lineStartingPoints.offsetY);
-      context?.lineTo(pageX - offsetLeft, pageY - offsetTop);
-      context?.stroke();
+    const lineCanvas = lineDrawingCanvasRef.current;
+    const lineCanvasContext = lineCanvas?.getContext("2d");
+    if (lineStartingPoints && lineCanvas && lineCanvasContext) {
+      setCanvasProperties(lineCanvas, lineCanvasContext); // Only do it one time. Here's repeated.
+      const lineTo: Coordinates = {
+        x: pageX - offsetLeft,
+        y: pageY - offsetTop,
+      };
+      drawInCanvas(lineCanvasContext, lineStartingPoints, lineTo);
     }
   };
 
@@ -162,3 +190,8 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
 };
 
 export default DrawingBoard;
+
+// TODO Before merging:
+// - Display the second canvas all the time, change the visibility with CSS
+// - Extract all those functions to outside the component
+// - Only set the second canvas properties once.
