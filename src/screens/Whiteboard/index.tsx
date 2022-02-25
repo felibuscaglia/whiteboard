@@ -27,7 +27,9 @@ const WhiteboardScreen = () => {
     <WhiteboardContext.Provider
       value={{ colors, selectedColor, setSelectedColor, setActiveAction }}
     >
-      <div>
+      <div
+        style={{ cursor: activeAction === Actions.TEXT ? "text" : "" }}
+      >
         <ButtonBar />
         <DrawingBoard activeAction={activeAction} />
         <Toolbar />

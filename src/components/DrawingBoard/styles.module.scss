@@ -13,3 +13,11 @@
   @include drawing-board(-1);
   background: transparent;
 }
+
+#contentEditableSpan {
+  position: absolute;
+  font-size: 1.563rem;
+  height: 0.875rem;
+  min-width: 0.063rem;
+  outline: none;
+}

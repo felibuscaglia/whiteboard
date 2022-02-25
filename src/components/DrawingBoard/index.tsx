@@ -104,8 +104,11 @@ const setCanvasProperties = (
 
 const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
   const [isDrawing, setIsDrawing] = useState(false);
-  const [lineStartingPoints, setLineStartingPoints] =
-    useState<Coordinates | null>(null);
+  const [
+    lineStartingPoints,
+    setLineStartingPoints,
+  ] = useState<Coordinates | null>(null);
+  const [textPosition, setTextPosition] = useState<Coordinates | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lineDrawingCanvasRef = useRef<HTMLCanvasElement>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -138,7 +141,13 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
     }
   }, [selectedColor]);
 
-  const handleMouseDown = ({ nativeEvent, pageX, pageY }: MouseEvent) => {
+  const handleMouseDown = ({
+    nativeEvent,
+    pageX,
+    pageY,
+    clientX,
+    clientY,
+  }: MouseEvent) => {
     const { offsetX, offsetY } = nativeEvent;
     const canvas = canvasRef.current;
     const offsetLeft = canvas?.offsetLeft || 0;
@@ -153,6 +162,11 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
           y: pageY - offsetTop,
         });
         break;
+      case Actions.TEXT:
+        setTextPosition({
+          x: clientX,
+          y: clientY,
+        });
     }
   };
 
@@ -221,6 +235,17 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
             activeAction === Actions.LINE_DRAWING ? "visible" : "hidden",
         }}
       />
+      {textPosition && (
+        <span
+          contentEditable
+          id={style.contentEditableSpan}
+          style={{
+            top: `${textPosition.y}px`,
+            left: `${textPosition.x}px`,
+            color: selectedColor,
+          }}
+        />
+      )}
     </>
   );
 };

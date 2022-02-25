@@ -11,7 +11,7 @@ import { WhiteboardContext } from "../../contexts/WhiteboardContext";
 const icons = [
   { icon: HiOutlinePencil, action: Actions.DRAWING },
   { icon: HiOutlineMinus, action: Actions.LINE_DRAWING },
-  { icon: RiText },
+  { icon: RiText, action: Actions.TEXT },
   { icon: RiEraserFill },
   { icon: BiUndo },
   { icon: ColorChangerButton },
