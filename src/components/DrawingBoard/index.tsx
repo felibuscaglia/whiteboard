@@ -15,6 +15,7 @@ import { Actions } from "../../shared/enums";
 import { drawInCanvas, transformNumberToPx } from "../../shared/helpers";
 import { Coordinates } from "../../shared/interfaces";
 import style from "./styles.module.scss";
+import ContentEditableSpan from "./ContentEditableSpan";
 
 interface IDrawingBoardProps {
   activeAction: Actions;
@@ -101,6 +102,13 @@ const setCanvasProperties = (
     context.lineWidth = 5;
   }
 };
+
+const addTextToCanvas = (context: CanvasRenderingContext2D | null, textPosition: Coordinates | null, text: string) => {
+  if(context && textPosition) {
+    context.font = '1.563rem Arial';
+    context.fillText(text, textPosition.x, textPosition.y);
+  }
+}
 
 const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
   const [isDrawing, setIsDrawing] = useState(false);
@@ -235,17 +243,12 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
             activeAction === Actions.LINE_DRAWING ? "visible" : "hidden",
         }}
       />
-      {textPosition && (
-        <span
-          contentEditable
-          id={style.contentEditableSpan}
-          style={{
-            top: `${textPosition.y}px`,
-            left: `${textPosition.x}px`,
-            color: selectedColor,
-          }}
-        />
-      )}
+      <ContentEditableSpan
+        textPosition={textPosition}
+        selectedColor={selectedColor}
+        canvasContext={contextRef.current}
+        setTextPosition={setTextPosition}
+      />
     </>
   );
 };

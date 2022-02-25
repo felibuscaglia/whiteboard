@@ -8,8 +8,8 @@ interface IColorTooltip {
 const ColorTooltip = ({ colors }: IColorTooltip) => {
   return (
     <div id={style.colorTooltip}>
-      {colors.map((color) => (
-        <ColorCircle color={color} height="1.125rem" width="1.125rem" />
+      {colors.map((color, i) => (
+        <ColorCircle color={color} height="1.125rem" width="1.125rem" key={i} />
       ))}
     </div>
   );
