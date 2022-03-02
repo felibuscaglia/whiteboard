@@ -103,19 +103,10 @@ const setCanvasProperties = (
   }
 };
 
-const addTextToCanvas = (context: CanvasRenderingContext2D | null, textPosition: Coordinates | null, text: string) => {
-  if(context && textPosition) {
-    context.font = '1.563rem Arial';
-    context.fillText(text, textPosition.x, textPosition.y);
-  }
-}
-
 const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
   const [isDrawing, setIsDrawing] = useState(false);
-  const [
-    lineStartingPoints,
-    setLineStartingPoints,
-  ] = useState<Coordinates | null>(null);
+  const [lineStartingPoints, setLineStartingPoints] =
+    useState<Coordinates | null>(null);
   const [textPosition, setTextPosition] = useState<Coordinates | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lineDrawingCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -171,10 +162,12 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
         });
         break;
       case Actions.TEXT:
-        setTextPosition({
-          x: clientX,
-          y: clientY,
-        });
+        if (!textPosition) {
+          setTextPosition({
+            x: clientX,
+            y: clientY,
+          });
+        }
     }
   };
 
