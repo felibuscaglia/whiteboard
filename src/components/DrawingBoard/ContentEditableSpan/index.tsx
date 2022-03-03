@@ -1,7 +1,7 @@
 import { Coordinates } from "../../../shared/interfaces";
 import style from "../styles.module.scss";
 import OutsideClickHandler from "react-outside-click-handler";
-import { Dispatch, SetStateAction, useCallback, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useState } from "react";
 
 interface IContentEditableSpanProps {
   selectedColor: string;
@@ -24,8 +24,10 @@ const handleOutsideClick = (
     canvasContext.fillStyle = selectedColor;
     canvasContext.fillText(input, textPosition.x, textPosition.y);
     contentEditableSpan.innerHTML = "";
-    setTextPosition(newCoordinates);
-    contentEditableSpan.focus();
+    if (newCoordinates.y < window.innerHeight - 59) {
+      setTextPosition(newCoordinates);
+      contentEditableSpan.focus();
+    }
   }
 };
 
