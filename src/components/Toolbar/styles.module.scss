@@ -8,6 +8,7 @@
   padding: 10px;
   @include display-flex(row, center, space-between);
   box-sizing: border-box;
+  background: white;
 
   input {
     font-size: 0.875rem;
