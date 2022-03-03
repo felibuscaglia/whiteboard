@@ -2,7 +2,6 @@ export const animals = [
   "alligator",
   "anteater",
   "armadillo",
-  "aurochs",
   "axolotl",
   "badger",
   "bat",

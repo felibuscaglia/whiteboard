@@ -1,7 +1,7 @@
 import { Coordinates } from "../../../shared/interfaces";
 import style from "../styles.module.scss";
 import OutsideClickHandler from "react-outside-click-handler";
-import { Dispatch, SetStateAction, useRef } from "react";
+import { Dispatch, SetStateAction, useCallback, useState } from "react";
 
 interface IContentEditableSpanProps {
   selectedColor: string;
@@ -15,15 +15,19 @@ const handleOutsideClick = (
   contentEditableSpan: HTMLSpanElement | null,
   textPosition: Coordinates,
   setTextPosition: Dispatch<SetStateAction<Coordinates | null>>,
-  selectedColor: string
+  selectedColor: string,
+  newCoordinates: Coordinates
 ) => {
-  console.log("I CLICK OUTSIDE!!");
-  if (canvasContext) {
-    const input = contentEditableSpan ? contentEditableSpan.innerHTML : "";
+  if (canvasContext && contentEditableSpan) {
+    const input = contentEditableSpan.innerHTML;
     canvasContext.font = "1.563rem Rubik, sans-serif";
-    canvasContext.fillStyle = selectedColor
+    canvasContext.fillStyle = selectedColor;
     canvasContext.fillText(input, textPosition.x, textPosition.y);
-    setTextPosition(null);
+    contentEditableSpan.innerHTML = "";
+    if (newCoordinates.y < window.innerHeight - 59) {
+      setTextPosition(newCoordinates);
+      contentEditableSpan.focus();
+    }
   }
 };
 
@@ -33,7 +37,14 @@ const CotentEditableSpan = ({
   canvasContext,
   setTextPosition,
 }: IContentEditableSpanProps) => {
-  const contentEditableSpanRef = useRef<HTMLSpanElement>(null);
+  const [spanNode, setSpanNode] = useState<HTMLSpanElement | null>(null);
+
+  const onRefChange = useCallback((node: HTMLSpanElement | null) => {
+    setSpanNode(node);
+    if (node) {
+      node.focus();
+    }
+  }, []);
 
   if (!textPosition) {
     return null;
@@ -41,13 +52,17 @@ const CotentEditableSpan = ({
 
   return (
     <OutsideClickHandler
-      onOutsideClick={() =>
+      onOutsideClick={({ clientX: x, clientY: y }) =>
         handleOutsideClick(
           canvasContext,
-          contentEditableSpanRef.current,
+          spanNode,
           textPosition,
           setTextPosition,
-          selectedColor
+          selectedColor,
+          {
+            x,
+            y,
+          }
         )
       }
     >
@@ -55,11 +70,11 @@ const CotentEditableSpan = ({
         contentEditable
         id={style.contentEditableSpan}
         style={{
-          top: `${textPosition.y}px`,
+          top: `${textPosition.y - 23}px`,
           left: `${textPosition.x}px`,
           color: selectedColor,
         }}
-        ref={contentEditableSpanRef}
+        ref={onRefChange}
         spellCheck={false}
       />
     </OutsideClickHandler>

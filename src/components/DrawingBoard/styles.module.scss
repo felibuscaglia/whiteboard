@@ -1,8 +1,6 @@
 @mixin drawing-board($z-index) {
   position: absolute;
   z-index: $z-index;
-  width: 100vw;
-  height: 100vh;
 }
 
 #drawingBoard {
@@ -18,5 +16,7 @@
   position: absolute;
   font-size: 1.563rem;
   min-width: 10rem;
+  min-height: 2rem;
   outline: none;
+  z-index: 0;
 }
