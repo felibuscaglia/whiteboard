@@ -12,7 +12,7 @@ const icons = [
   { icon: HiOutlinePencil, action: Actions.DRAWING },
   { icon: HiOutlineMinus, action: Actions.LINE_DRAWING },
   { icon: RiText, action: Actions.TEXT },
-  { icon: RiEraserFill },
+  { icon: RiEraserFill, action: Actions.ERASE },
   { icon: BiUndo },
   { icon: ColorChangerButton },
 ];

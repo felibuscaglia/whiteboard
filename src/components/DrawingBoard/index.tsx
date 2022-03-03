@@ -224,6 +224,11 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
         onMouseMove={handleMouseMove}
         ref={canvasRef}
         id={style.drawingBoard}
+        className={
+          activeAction === Actions.ERASE
+            ? style.eraserCursor
+            : style.paintCursor
+        }
       />
       <canvas
         id={style.lineDrawingBoard}
@@ -235,6 +240,11 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
           visibility:
             activeAction === Actions.LINE_DRAWING ? "visible" : "hidden",
         }}
+        className={
+          activeAction === Actions.ERASE
+            ? style.eraserCursor
+            : style.paintCursor
+        }
       />
       <ContentEditableSpan
         textPosition={textPosition}
