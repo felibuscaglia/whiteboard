@@ -37,10 +37,15 @@ const startFreeDrawing = (
   contextRef: MutableRefObject<CanvasRenderingContext2D | null>,
   offsetX: number,
   offsetY: number,
-  setIsDrawing: Dispatch<SetStateAction<boolean>>
+  setIsDrawing: Dispatch<SetStateAction<boolean>>,
+  isErasing: boolean
 ) => {
   contextRef.current?.beginPath();
   contextRef.current?.moveTo(offsetX, offsetY);
+  if (isErasing && contextRef.current) {
+    contextRef.current.strokeStyle = "white";
+    contextRef.current.lineWidth = 50;
+  }
   setIsDrawing(true);
 };
 
@@ -48,10 +53,16 @@ const startFreeDrawing = (
 
 const finishFreeDrawing = (
   contextRef: MutableRefObject<CanvasRenderingContext2D | null>,
-  setIsDrawing: Dispatch<SetStateAction<boolean>>
+  setIsDrawing: Dispatch<SetStateAction<boolean>>,
+  isErasing: boolean,
+  selectedColor: string
 ) => {
   contextRef.current?.closePath();
   setIsDrawing(false);
+  if (isErasing && contextRef.current) {
+    contextRef.current.strokeStyle = selectedColor;
+    contextRef.current.lineWidth = 5;
+  }
 };
 
 // Mouse move functions
@@ -105,8 +116,10 @@ const setCanvasProperties = (
 
 const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
   const [isDrawing, setIsDrawing] = useState(false);
-  const [lineStartingPoints, setLineStartingPoints] =
-    useState<Coordinates | null>(null);
+  const [
+    lineStartingPoints,
+    setLineStartingPoints,
+  ] = useState<Coordinates | null>(null);
   const [textPosition, setTextPosition] = useState<Coordinates | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lineDrawingCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -153,7 +166,14 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
     const offsetTop = canvas?.offsetTop || 0;
     switch (activeAction) {
       case Actions.DRAWING:
-        startFreeDrawing(contextRef, offsetX, offsetY, setIsDrawing);
+      case Actions.ERASE:
+        startFreeDrawing(
+          contextRef,
+          offsetX,
+          offsetY,
+          setIsDrawing,
+          activeAction === Actions.ERASE
+        );
         break;
       case Actions.LINE_DRAWING:
         setLineStartingPoints({
@@ -174,7 +194,13 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
   const handleMouseUp = ({ pageX, pageY }: MouseEvent) => {
     switch (activeAction) {
       case Actions.DRAWING:
-        finishFreeDrawing(contextRef, setIsDrawing);
+      case Actions.ERASE:
+        finishFreeDrawing(
+          contextRef,
+          setIsDrawing,
+          activeAction === Actions.ERASE,
+          selectedColor
+        );
         break;
       case Actions.LINE_DRAWING:
         const canvas = canvasRef.current;
@@ -202,6 +228,7 @@ const DrawingBoard = ({ activeAction }: IDrawingBoardProps) => {
 
     switch (activeAction) {
       case Actions.DRAWING:
+      case Actions.ERASE:
         freeDraw(e, isDrawing, contextRef);
         break;
       case Actions.LINE_DRAWING:
